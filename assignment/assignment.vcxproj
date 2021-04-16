@@ -174,10 +174,15 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\application.cpp" />
+    <ClCompile Include="src\gui\input_manager.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\gui\window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\mandelbrot.h" />
+    <ClInclude Include="src\application.h" />
+    <ClInclude Include="src\gui\input_manager.h" />
+    <ClInclude Include="src\gui\window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

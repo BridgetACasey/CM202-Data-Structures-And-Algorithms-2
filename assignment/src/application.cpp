@@ -4,6 +4,7 @@
 
 #include "gui/input_manager.h"
 #include "gui/window.h"
+#include "debug.h"
 
 Application::Application()
 {
@@ -18,10 +19,28 @@ Application::~Application()
 
 void Application::run()
 {
-	inputManager->update();
-	window->update();
+	while (window->isOpen())
+	{
+		//inputManager->update();
+		window->update();
 
-	render();
+		if (inputManager->isKeyPressed(sf::Keyboard::Key::R))
+		{
+			debugPrint("R IS PRESSED\n");
+		}
+
+		else if (inputManager->isKeyDown(sf::Keyboard::Key::R))
+		{
+			debugPrint("R IS DOWN\n");
+		}
+
+		else if (inputManager->isKeyReleased(sf::Keyboard::Key::R))
+		{
+			debugPrint("R IS RELEASED\n");
+		}
+
+		render();
+	}
 }
 
 void Application::render()

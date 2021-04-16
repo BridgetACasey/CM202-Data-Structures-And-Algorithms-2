@@ -4,13 +4,13 @@
 
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
+#include <array>
 
 enum class InputDevice
 {
-	IDLE = 0,
+	RELEASED = 0,
 	PRESSED,
-	DOWN,
-	RELEASED
+	DOWN
 };
 
 struct Mouse
@@ -21,11 +21,6 @@ struct Mouse
 	float x;
 	float y;
 };
-
-namespace sf
-{
-	enum Key;
-}
 
 class InputManager
 {
@@ -51,5 +46,5 @@ private:
 
 	Mouse mouse;
 
-	InputDevice keys[sf::Keyboard::Key::KeyCount] = { InputDevice::IDLE };
+	std::array<InputDevice, sf::Keyboard::Key::KeyCount> keys = { InputDevice::RELEASED };
 };

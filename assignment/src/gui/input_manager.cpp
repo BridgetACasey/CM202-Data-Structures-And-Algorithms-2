@@ -49,18 +49,12 @@ bool InputManager::isKeyReleased(sf::Keyboard::Key key)
 
 void InputManager::resetKeys()
 {
-	for (InputDevice key : keys)
-	{
-		if (key != InputDevice::IDLE)
-		{
-			key = InputDevice::IDLE;
-		}
-	}
+	keys.fill(InputDevice::RELEASED);
 }
 
 void InputManager::setKeyActive(sf::Keyboard::Key key)
 {
-	keys[key] = (keys[key] == InputDevice::IDLE) ? InputDevice::PRESSED : InputDevice::DOWN;
+	keys[key] = (keys[key] == InputDevice::PRESSED) ? InputDevice::DOWN : InputDevice::PRESSED;
 }
 
 void InputManager::setKeyInactive(sf::Keyboard::Key key)

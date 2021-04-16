@@ -181,6 +181,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\application.h" />
+    <ClInclude Include="src\debug.h" />
     <ClInclude Include="src\gui\input_manager.h" />
     <ClInclude Include="src\gui\window.h" />
   </ItemGroup>

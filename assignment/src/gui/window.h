@@ -4,7 +4,7 @@
 
 class InputManager;
 
-class Window : private sf::RenderWindow
+class Window : public sf::RenderWindow
 {
 public:
 	Window(InputManager* input);

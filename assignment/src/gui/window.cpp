@@ -20,57 +20,57 @@ Window::~Window()
 
 void Window::update()
 {
-    while (isOpen())
+    sf::Event event;
+
+    while (pollEvent(event))
     {
-        sf::Event event;
+		switch (event.type)
+		{
+			case sf::Event::Closed:
+				close();
+				break;
 
-        while (pollEvent(event))
-        {
-			switch (event.type)
-			{
-				case sf::Event::Closed:
-					close();
-					break;
+			case sf::Event::KeyPressed:
+				inputManager->setKeyActive(event.key.code);
+				break;
 
-				case sf::Event::KeyPressed:
-					inputManager->setKeyActive(event.key.code);
-					break;
+			case sf::Event::KeyReleased:
+				inputManager->setKeyInactive(event.key.code);
+				break;
 
-				case sf::Event::KeyReleased:
-					inputManager->setKeyInactive(event.key.code);
-					break;
+			case sf::Event::MouseMoved:
+				inputManager->setMousePosition(event.mouseMove.x, event.mouseMove.y);
+				break;
 
-				case sf::Event::MouseMoved:
-					inputManager->setMousePosition(event.mouseMove.x, event.mouseMove.y);
-					break;
+			case sf::Event::MouseButtonPressed:
+				if (event.mouseButton.button == sf::Mouse::Left)
+				{
+					inputManager->mouse.leftButton = (inputManager->mouse.leftButton == InputDevice::RELEASED)
+						? InputDevice::PRESSED : InputDevice::DOWN;
+				}
 
-				case sf::Event::MouseButtonPressed:
-					if (event.mouseButton.button == sf::Mouse::Left)
-					{
-						inputManager->mouse.leftButton = (inputManager->mouse.leftButton == InputDevice::IDLE)
-							? InputDevice::PRESSED : InputDevice::DOWN;
-					}
+				else if (event.mouseButton.button == sf::Mouse::Right)
+				{
+					inputManager->mouse.rightButton = (inputManager->mouse.rightButton == InputDevice::RELEASED)
+						? InputDevice::PRESSED : InputDevice::DOWN;
+				}
+				break;
 
-					else if (event.mouseButton.button == sf::Mouse::Right)
-					{
-						inputManager->mouse.rightButton = (inputManager->mouse.rightButton == InputDevice::IDLE)
-							? InputDevice::PRESSED : InputDevice::DOWN;
-					}
-					break;
+			case sf::Event::MouseButtonReleased:
+				if (event.mouseButton.button == sf::Mouse::Left)
+				{
+					inputManager->mouse.leftButton = InputDevice::RELEASED;
+				}
 
-				case sf::Event::MouseButtonReleased:
-					if (event.mouseButton.button == sf::Mouse::Left)
-					{
-						inputManager->mouse.leftButton = InputDevice::RELEASED;
-					}
+				else if (event.mouseButton.button == sf::Mouse::Right)
+				{
+					inputManager->mouse.rightButton = InputDevice::RELEASED;
+				}
+				break;
 
-					else if (event.mouseButton.button == sf::Mouse::Right)
-					{
-						inputManager->mouse.rightButton = InputDevice::RELEASED;
-					}
-					break;
-			}
-        }
+			default:
+				break;
+		}
     }
 }
 

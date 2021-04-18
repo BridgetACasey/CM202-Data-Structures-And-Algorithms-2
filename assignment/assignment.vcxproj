@@ -104,8 +104,9 @@
       <AdditionalLibraryDirectories>../external/SFML-2.5.1/lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /d "$(SolutionDir)binaries\*.dll" "$(OutDir)"</Command>
-      <Message>Copying DLL dependencies</Message>
+      <Command>xcopy /y /d "$(SolutionDir)binaries\*.dll" "$(OutDir)"
+xcopy /y /d "$(SolutionDir)assets\*" "$(OutDir)"</Command>
+      <Message>Copying dependencies</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -146,8 +147,9 @@
       <AdditionalLibraryDirectories>../external/SFML-2.5.1/lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /d "$(SolutionDir)binaries\*.dll" "$(OutDir)"</Command>
-      <Message>Copying DLL dependencies</Message>
+      <Command>xcopy /y /d "$(SolutionDir)binaries\*.dll" "$(OutDir)"
+xcopy /y /d "$(SolutionDir)assets\*" "$(OutDir)"</Command>
+      <Message>Copying dependencies</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -174,6 +176,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\mandelbrot.cpp" />
     <ClCompile Include="src\gui\button.cpp" />
     <ClCompile Include="src\application.cpp" />
     <ClCompile Include="src\gui\input_manager.cpp" />
@@ -182,6 +185,7 @@
     <ClCompile Include="src\gui\app_text.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\mandelbrot.h" />
     <ClInclude Include="src\gui\button.h" />
     <ClInclude Include="src\application.h" />
     <ClInclude Include="src\debug.h" />

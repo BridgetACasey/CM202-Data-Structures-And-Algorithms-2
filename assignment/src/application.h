@@ -6,6 +6,7 @@ class InputManager;
 class Window;
 class AppText;
 class Button;
+class Mandelbrot;
 
 class Application
 {
@@ -24,4 +25,6 @@ private:
 	AppText* title;
 
 	Button* button;
+
+	Mandelbrot* mandelbrot;
 };

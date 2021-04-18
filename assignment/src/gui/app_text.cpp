@@ -5,7 +5,7 @@
 
 AppText::AppText()
 {
-	if (!font.loadFromFile("arial.ttf"))
+	if (!font.loadFromFile("assets/arial.ttf"))
 	{
 		debugPrint("Error loading font!");
 	}

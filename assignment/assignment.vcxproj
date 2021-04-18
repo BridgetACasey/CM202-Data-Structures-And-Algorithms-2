@@ -105,7 +105,7 @@
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y /d "$(SolutionDir)binaries\*.dll" "$(OutDir)"
-xcopy /y /d "$(SolutionDir)assets\*" "$(OutDir)"</Command>
+xcopy /y /d "$(SolutionDir)assets\*" "$(OutDir)assets\"</Command>
       <Message>Copying dependencies</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -148,7 +148,7 @@ xcopy /y /d "$(SolutionDir)assets\*" "$(OutDir)"</Command>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y /d "$(SolutionDir)binaries\*.dll" "$(OutDir)"
-xcopy /y /d "$(SolutionDir)assets\*" "$(OutDir)"</Command>
+xcopy /y /d "$(SolutionDir)assets\*" "$(OutDir)assets\"</Command>
       <Message>Copying dependencies</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>

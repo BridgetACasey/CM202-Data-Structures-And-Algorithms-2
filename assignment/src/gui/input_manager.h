@@ -4,19 +4,11 @@
 
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
-#include <array>
-
-enum class InputDevice
-{
-	RELEASED = 0,
-	PRESSED,
-	DOWN
-};
 
 struct Mouse
 {
-	InputDevice leftButton;
-	InputDevice rightButton;
+	bool left = false;
+	bool right = false;
 
 	float x;
 	float y;
@@ -30,21 +22,18 @@ public:
 	InputManager();
 	~InputManager();
 
-	void update();
+	bool isKeyPressed(sf::Keyboard::Key key) const;
+	bool isKeyReleased(sf::Keyboard::Key key) const;
 
-	bool isKeyPressed(sf::Keyboard::Key key);
-	bool isKeyDown(sf::Keyboard::Key key);
-	bool isKeyReleased(sf::Keyboard::Key key);
+	inline Mouse& getMouse() { return mouse; }
 
 private:
-	void resetKeys();
-
-	void setKeyActive(sf::Keyboard::Key key);
-	void setKeyInactive(sf::Keyboard::Key key);
+	inline void setKeyPressed(sf::Keyboard::Key key) { keys[key] = true; }
+	inline void setKeyReleased(sf::Keyboard::Key key) { keys[key] = false; }
 
 	void setMousePosition(float x, float y);
 
 	Mouse mouse;
 
-	std::array<InputDevice, sf::Keyboard::Key::KeyCount> keys = { InputDevice::RELEASED };
+	bool keys[sf::Keyboard::Key::KeyCount] = { 0 };
 };

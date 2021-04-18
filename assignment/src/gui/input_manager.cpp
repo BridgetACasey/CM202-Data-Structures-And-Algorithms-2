@@ -12,14 +12,9 @@ InputManager::~InputManager()
 
 }
 
-void InputManager::update()
+bool InputManager::isKeyPressed(sf::Keyboard::Key key) const
 {
-	resetKeys();
-}
-
-bool InputManager::isKeyPressed(sf::Keyboard::Key key)
-{
-	if (keys[key] == InputDevice::PRESSED)
+	if (keys[key])
 	{
 		return true;
 	}
@@ -27,39 +22,14 @@ bool InputManager::isKeyPressed(sf::Keyboard::Key key)
 	return false;
 }
 
-bool InputManager::isKeyDown(sf::Keyboard::Key key)
+bool InputManager::isKeyReleased(sf::Keyboard::Key key) const
 {
-	if (keys[key] == InputDevice::DOWN)
+	if (keys[key])
 	{
-		return true;
+		return false;
 	}
 
-	return false;
-}
-
-bool InputManager::isKeyReleased(sf::Keyboard::Key key)
-{
-	if (keys[key] == InputDevice::RELEASED)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-void InputManager::resetKeys()
-{
-	keys.fill(InputDevice::RELEASED);
-}
-
-void InputManager::setKeyActive(sf::Keyboard::Key key)
-{
-	keys[key] = (keys[key] == InputDevice::PRESSED) ? InputDevice::DOWN : InputDevice::PRESSED;
-}
-
-void InputManager::setKeyInactive(sf::Keyboard::Key key)
-{
-	keys[key] = InputDevice::RELEASED;
+	return true;
 }
 
 void InputManager::setMousePosition(float x, float y)

@@ -4,6 +4,8 @@
 
 class InputManager;
 class Window;
+class AppText;
+class Button;
 
 class Application
 {
@@ -18,4 +20,8 @@ public:
 private:
 	InputManager* inputManager;
 	Window* window;
+
+	AppText* title;
+
+	Button* button;
 };

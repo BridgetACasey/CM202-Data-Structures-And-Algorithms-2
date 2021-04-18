@@ -4,12 +4,21 @@
 
 #include "gui/input_manager.h"
 #include "gui/window.h"
-#include "debug.h"
+#include "gui/button.h"
 
 Application::Application()
 {
 	inputManager = new InputManager();
 	window = new Window(inputManager);
+
+	title = new AppText();
+	title->setPosition(sf::Vector2f(575.0f, 100.0f));
+	title->setString("MANDELBROT");
+
+	button = new Button(inputManager);
+	button->setPosition(sf::Vector2f(300.0f, 300.0f));
+	button->setSize(sf::Vector2f(150.0f, 50.0f));
+	button->setText("TEXT");
 }
 
 Application::~Application()
@@ -21,22 +30,11 @@ void Application::run()
 {
 	while (window->isOpen())
 	{
-		//inputManager->update();
 		window->update();
 
-		if (inputManager->isKeyPressed(sf::Keyboard::Key::R))
+		if (button->isHovering())
 		{
-			debugPrint("R IS PRESSED\n");
-		}
 
-		else if (inputManager->isKeyDown(sf::Keyboard::Key::R))
-		{
-			debugPrint("R IS DOWN\n");
-		}
-
-		else if (inputManager->isKeyReleased(sf::Keyboard::Key::R))
-		{
-			debugPrint("R IS RELEASED\n");
 		}
 
 		render();
@@ -45,5 +43,13 @@ void Application::run()
 
 void Application::render()
 {
+	window->clearBuffer();
 
+	//Render window elements
+	window->render(*title);
+
+	window->render(*button);
+	window->render(*button->getText());
+
+	window->displayBuffer();
 }

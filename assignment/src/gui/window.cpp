@@ -31,11 +31,11 @@ void Window::update()
 				break;
 
 			case sf::Event::KeyPressed:
-				inputManager->setKeyActive(event.key.code);
+				inputManager->setKeyPressed(event.key.code);
 				break;
 
 			case sf::Event::KeyReleased:
-				inputManager->setKeyInactive(event.key.code);
+				inputManager->setKeyReleased(event.key.code);
 				break;
 
 			case sf::Event::MouseMoved:
@@ -45,26 +45,24 @@ void Window::update()
 			case sf::Event::MouseButtonPressed:
 				if (event.mouseButton.button == sf::Mouse::Left)
 				{
-					inputManager->mouse.leftButton = (inputManager->mouse.leftButton == InputDevice::RELEASED)
-						? InputDevice::PRESSED : InputDevice::DOWN;
+					inputManager->getMouse().left = true;
 				}
 
 				else if (event.mouseButton.button == sf::Mouse::Right)
 				{
-					inputManager->mouse.rightButton = (inputManager->mouse.rightButton == InputDevice::RELEASED)
-						? InputDevice::PRESSED : InputDevice::DOWN;
+					inputManager->getMouse().right = true;
 				}
 				break;
 
 			case sf::Event::MouseButtonReleased:
 				if (event.mouseButton.button == sf::Mouse::Left)
 				{
-					inputManager->mouse.leftButton = InputDevice::RELEASED;
+					inputManager->getMouse().left = false;
 				}
 
 				else if (event.mouseButton.button == sf::Mouse::Right)
 				{
-					inputManager->mouse.rightButton = InputDevice::RELEASED;
+					inputManager->getMouse().right = false;
 				}
 				break;
 
@@ -76,7 +74,7 @@ void Window::update()
 
 void Window::clearBuffer()
 {
-	clear(sf::Color(255, 255, 255, 255));
+	clear(sf::Color(0, 0, 0, 255));
 }
 
 void Window::displayBuffer()

@@ -1,5 +1,7 @@
 #include "mandelbrot.h"
 
+#include <vector>
+
 const int WIDTH = 1600;
 const int HEIGHT = 900;
 
@@ -59,6 +61,32 @@ void Mandelbrot::compute(double left, double right, double top, double bottom)
 			}
 		}
 	}
+}
+
+void Mandelbrot::assignPixels()
+{
+	std::vector<sf::Uint8> pixels;
+
+	for (int y = 0; y < HEIGHT; ++y)
+	{
+		for (int x = 0; x < WIDTH; ++x)
+		{
+			sf::Uint8 pixel[4] =
+			{
+				image[y][x] & 0xFF,			// blue channel
+				(image[y][x] >> 8) & 0xFF,	// green channel
+				(image[y][x] >> 16) & 0xFF, // red channel
+				255							// alpha channel
+			};
+
+			pixels.push_back(pixel[2]);
+			pixels.push_back(pixel[1]);
+			pixels.push_back(pixel[0]);
+			pixels.push_back(pixel[3]);
+		}
+	}
+
+	displayImage.create(WIDTH, HEIGHT, pixels.data());
 }
 
 void Mandelbrot::writeToTGA(const char* fileName)

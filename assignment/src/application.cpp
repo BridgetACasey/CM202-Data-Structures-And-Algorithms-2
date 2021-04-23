@@ -23,6 +23,16 @@ Application::Application()
 	button->setText("TEXT");
 
 	mandelbrot = new Mandelbrot();
+
+	mandelbrot->compute(-2.0, 1.0, 1.125, -1.125);
+	mandelbrot->assignPixels();
+	//mandelbrot->writeToTGA("output/output.tga");
+
+	displayTexture.create(1600, 900);
+	displayTexture.loadFromImage(mandelbrot->getImage(), sf::IntRect());
+
+	displaySprite.setTexture(displayTexture);
+	displaySprite.setPosition(sf::Vector2f(0.0f, 0.0f));
 }
 
 Application::~Application()
@@ -32,17 +42,9 @@ Application::~Application()
 
 void Application::run()
 {
-	//mandelbrot->compute(-2.0, 1.0, 1.125, -1.125);
-	//mandelbrot->writeToTGA("output/output.tga");
-
 	while (window->isOpen())
 	{
 		window->update();
-
-		if (button->isHovering())
-		{
-
-		}
 
 		render();
 	}
@@ -53,10 +55,12 @@ void Application::render()
 	window->clearBuffer();
 
 	//Render window elements
-	window->render(*title);
+	//window->render(*title);
 
-	window->render(*button);
-	window->render(*button->getText());
+	//window->render(*button);
+	//window->render(*button->getText());
+
+	window->render(displaySprite);
 
 	window->displayBuffer();
 }

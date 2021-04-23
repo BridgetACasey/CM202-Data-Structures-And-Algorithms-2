@@ -8,6 +8,9 @@ class AppText;
 class Button;
 class Mandelbrot;
 
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/Sprite.hpp>
+
 class Application
 {
 public:
@@ -23,8 +26,10 @@ private:
 	Window* window;
 
 	AppText* title;
-
 	Button* button;
 
 	Mandelbrot* mandelbrot;
+
+	sf::Texture displayTexture;
+	sf::Sprite displaySprite;
 };

@@ -2,23 +2,42 @@
 
 #include <complex>
 #include <fstream>
+#include <mutex>
 
-#include <SFML/Graphics/Image.hpp>
+const int WIDTH = 1600;
+const int HEIGHT = 900;
+
+struct ImageCoordinates
+{
+	//Default image values - will display the whole mandelbrot set
+	double left = -2.0;
+	double right = 1.0;
+	double top = 1.125;
+	double bottom = -1.125;
+
+	int maxIterations = 500;
+};
+
+struct ImageDimensions
+{
+	int minX = 0;
+	int minY = 0;
+	int maxX = WIDTH;
+	int maxY = HEIGHT;
+};
 
 class Mandelbrot
 {
 public:
-	Mandelbrot();
+	Mandelbrot(ImageCoordinates* coords, ImageDimensions* dims);
 	~Mandelbrot();
 
-	void compute(double left, double right, double top, double bottom);
-
-	void assignPixels();
-
+	void compute();
 	void writeToTGA(const char* fileName);
 
-	inline sf::Image& getImage() { return displayImage; }
-
 private:
-	sf::Image displayImage;
+	std::mutex imageMutex;
+
+	ImageCoordinates coordinates;
+	ImageDimensions dimensions;
 };

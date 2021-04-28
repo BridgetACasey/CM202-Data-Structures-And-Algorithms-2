@@ -10,7 +10,7 @@ Window::Window(InputManager* input)
 {
 	inputManager = input;
 
-	create(sf::VideoMode(1600, 900), "Application", sf::Style::Titlebar | sf::Style::Close);
+	create(sf::VideoMode(1600, 900), "CMP202 - Interactive Mandelbrot Set (Bridget A. Casey)", sf::Style::Titlebar | sf::Style::Close);
 }
 
 Window::~Window()

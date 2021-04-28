@@ -1,17 +1,14 @@
 #include "mandelbrot.h"
 
 #include <vector>
+#include <thread>
 
-const int WIDTH = 1600;
-const int HEIGHT = 900;
+extern uint32_t image[HEIGHT][WIDTH];
 
-const int MAX_ITERATIONS = 500;
-
-uint32_t image[HEIGHT][WIDTH];
-
-Mandelbrot::Mandelbrot()
+Mandelbrot::Mandelbrot(ImageCoordinates* coords, ImageDimensions* dims)
 {
-
+	coordinates = *coords;
+	dimensions = *dims;
 }
 
 Mandelbrot::~Mandelbrot()
@@ -19,18 +16,16 @@ Mandelbrot::~Mandelbrot()
 
 }
 
-// Render the Mandelbrot set into the image array.
-// The parameters specify the region on the complex plane to plot.
-void Mandelbrot::compute(double left, double right, double top, double bottom)
+void Mandelbrot::compute()
 {
-	for (int y = 0; y < HEIGHT; ++y)
+	for (int y = dimensions.minY; y < dimensions.maxY; ++y)
 	{
-		for (int x = 0; x < WIDTH; ++x)
+		for (int x = dimensions.minX; x < dimensions.maxX; ++x)
 		{
 			// Work out the point in the complex plane that
 			// corresponds to this pixel in the output image.
-			std::complex<double> c(left + (x * (right - left) / WIDTH),
-				top + (y * (bottom - top) / HEIGHT));
+			std::complex<double> c(coordinates.left + (x * (coordinates.right - coordinates.left) / WIDTH),
+				coordinates.top + (y * (coordinates.bottom - coordinates.top) / HEIGHT));
 
 			// Start off z at (0, 0).
 			std::complex<double> z(0.0, 0.0);
@@ -38,55 +33,32 @@ void Mandelbrot::compute(double left, double right, double top, double bottom)
 			// Iterate z = z^2 + c until z moves more than 2 units
 			// away from (0, 0), or we've iterated too many times.
 			int iterations = 0;
-			while (abs(z) < 2.0 && iterations < MAX_ITERATIONS)
+			while (abs(z) < 2.0 && iterations < coordinates.maxIterations)
 			{
 				z = (z * z) + c;
 
 				++iterations;
 			}
 
-			if (iterations == MAX_ITERATIONS)
+			if (iterations == coordinates.maxIterations)
 			{
 				// z didn't escape from the circle.
 				// This point is in the Mandelbrot set.
+				std::unique_lock<std::mutex> lock(imageMutex);
+
 				//image[y][x] = 0x000000; // black
 				image[y][x] = (16 << iterations) + (8 << iterations) + (iterations);
 			}
 			else
 			{
 				// z escaped within less than MAX_ITERATIONS
-				// iterations. This point isn't in the set.
+				std::unique_lock<std::mutex> lock(imageMutex);
+
 				//image[y][x] = 0xFFFFFF; // white
 				image[y][x] = (16 << iterations) + (8 << iterations) + (iterations);
 			}
 		}
 	}
-}
-
-void Mandelbrot::assignPixels()
-{
-	std::vector<sf::Uint8> pixels;
-
-	for (int y = 0; y < HEIGHT; ++y)
-	{
-		for (int x = 0; x < WIDTH; ++x)
-		{
-			sf::Uint8 pixel[4] =
-			{
-				image[y][x] & 0xFF,			// blue channel
-				(image[y][x] >> 8) & 0xFF,	// green channel
-				(image[y][x] >> 16) & 0xFF, // red channel
-				255							// alpha channel
-			};
-
-			pixels.push_back(pixel[2]);
-			pixels.push_back(pixel[1]);
-			pixels.push_back(pixel[0]);
-			pixels.push_back(pixel[3]);
-		}
-	}
-
-	displayImage.create(WIDTH, HEIGHT, pixels.data());
 }
 
 void Mandelbrot::writeToTGA(const char* fileName)

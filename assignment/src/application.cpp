@@ -6,7 +6,7 @@
 #include "gui/window.h"
 #include "gui/button.h"
 
-#include "mandelbrot.h"
+#include "utility.h"
 
 #include <thread>
 
@@ -17,18 +17,23 @@ extern uint32_t image[HEIGHT][WIDTH];
 Application::Application()
 {
 	calculating = false;
+	threadsUsed = MAX_THREADS;
+
+	deltaTime = 0.0f;
 
 	inputManager = new InputManager();
 	window = new Window(inputManager);
 
 	//Creating text objects
-	title = new AppText();
-	title->setPosition(sf::Vector2f(500.0f, 100.0f));
-	title->setString("MANDELBROT SET");
+	menuTitleText = new AppText();
+	menuTitleText->setPosition(sf::Vector2f(500.0f, 100.0f));
+	menuTitleText->setCharacterSize(64);
+	menuTitleText->setString("MANDELBROT SET");
 
-	loading = new AppText();
-	loading->setPosition(sf::Vector2f(550.0f, 375.0f));
-	loading->setString("CALCULATING");
+	loadingScreenText = new AppText();
+	loadingScreenText->setPosition(sf::Vector2f(550.0f, 375.0f));
+	loadingScreenText->setCharacterSize(64);
+	loadingScreenText->setString("CALCULATING");
 
 	//Creating button objects
 	runButton = new Button(inputManager);
@@ -45,6 +50,56 @@ Application::Application()
 	backButton->setPosition(sf::Vector2f(100.0f, 200.0f));
 	backButton->setSize(sf::Vector2f(150.0f, 50.0f));
 	backButton->setText("BACK");
+
+	for (int i = 0; i < 6; ++i)
+	{
+		Button* lowerArrow = new Button(inputManager);
+		lowerArrow->setPosition(sf::Vector2f(100.0f, 250.0f + (i * 100.0f)));
+		lowerArrow->setSize(sf::Vector2f(50.0f, 50.0f));
+		lowerArrow->setText("<");
+
+		arrowButtons.push_back(lowerArrow);
+	}
+
+	for (int i = 0; i < 6; ++i)
+	{
+		Button* upperArrow = new Button(inputManager);
+		upperArrow->setPosition(sf::Vector2f(650.0f, 250.0f + (i * 100.0f)));
+		upperArrow->setSize(sf::Vector2f(50.0f, 50.0f));
+		upperArrow->setText(">");
+
+		arrowButtons.push_back(upperArrow);
+	}
+
+	AppText* top = new AppText();
+	top->setPosition(sf::Vector2f(150.0f, 250.0f));
+	top->setString(std::to_string(imageCoordinates.top));
+	arrowText.push_back(top);
+
+	AppText* bottom = new AppText();
+	bottom->setPosition(sf::Vector2f(150.0f, 350.0f));
+	bottom->setString(std::to_string(imageCoordinates.bottom));
+	arrowText.push_back(bottom);
+
+	AppText* left = new AppText();
+	left->setPosition(sf::Vector2f(150.0f, 450.0f));
+	left->setString(std::to_string(imageCoordinates.left));
+	arrowText.push_back(left);
+
+	AppText* right = new AppText();
+	right->setPosition(sf::Vector2f(150.0f, 550.0f));
+	right->setString(std::to_string(imageCoordinates.right));
+	arrowText.push_back(right);
+
+	AppText* maxItr = new AppText();
+	maxItr->setPosition(sf::Vector2f(150.0f, 650.0f));
+	maxItr->setString(std::to_string(imageCoordinates.maxIterations));
+	arrowText.push_back(maxItr);
+
+	AppText* threads = new AppText();
+	threads->setPosition(sf::Vector2f(150.0f, 750.0f));
+	threads->setString(std::to_string(threadsUsed));
+	arrowText.push_back(threads);
 
 	appState = ApplicationState::MENU;
 }
@@ -68,6 +123,8 @@ void Application::run()
 
 void Application::update()
 {
+	deltaTime = getDeltaTime();
+
 	//Checking for this before the switch statement so the loading screen is displayed before calculations begin
 	if (calculating)
 	{
@@ -77,6 +134,8 @@ void Application::update()
 	switch (appState)
 	{
 		case ApplicationState::MENU:
+			updateCoordinates(imageCoordinates);
+			
 			if (runButton->isClicked())
 			{
 				calculating = true;
@@ -109,12 +168,23 @@ void Application::render()
 		case ApplicationState::MENU:
 			window->clearBuffer();
 
-			window->render(*title);
+			window->render(*menuTitleText);
 
 			window->render(*runButton);
 			window->render(*runButton->getText());
 			window->render(*quitButton);
 			window->render(*quitButton->getText());
+
+			for (AppText* text : arrowText)
+			{
+				window->render(*text);
+			}
+
+			for (Button* button : arrowButtons)
+			{
+				window->render(*button);
+				window->render(*button->getText());
+			}
 
 			window->displayBuffer();
 			break;
@@ -122,7 +192,7 @@ void Application::render()
 		case ApplicationState::LOADING:
 			window->clearBuffer();
 
-			window->render(*loading);
+			window->render(*loadingScreenText);
 
 			window->displayBuffer();
 			break;
@@ -140,21 +210,78 @@ void Application::render()
 	}
 }
 
+float Application::getDeltaTime()
+{
+	return appClock.restart().asSeconds();
+}
+
+void Application::updateCoordinates(ImageCoordinates& coords)
+{
+	clamp(coords.top, 0.0, 1.125);
+	clamp(coords.bottom, -1.125, 0.0);
+	clamp(coords.left, -2.0, 0.0);
+	clamp(coords.right, 0.0, 1.0);
+	clamp(coords.maxIterations, 100.0, 1000.0);
+	clamp(threadsUsed, 3, MAX_THREADS);
+
+	arrowText.at(0)->setString("  Top:   " + std::to_string(imageCoordinates.top));
+	arrowText.at(1)->setString("  Bottom:   " + std::to_string(imageCoordinates.bottom));
+	arrowText.at(2)->setString("  Left:   " + std::to_string(imageCoordinates.left));
+	arrowText.at(3)->setString("  Right:   " + std::to_string(imageCoordinates.right));
+	arrowText.at(4)->setString("  Max Itr:   " + std::to_string(imageCoordinates.maxIterations));
+	arrowText.at(5)->setString("  Threads:   " + std::to_string(threadsUsed));
+
+	if (arrowButtons.at(0)->isClicked())
+		adjustValue(coords.top, false, deltaTime);
+
+	else if (arrowButtons.at(1)->isClicked())
+		adjustValue(coords.bottom, false, deltaTime);
+
+	else if (arrowButtons.at(2)->isClicked())
+		adjustValue(coords.left, false, deltaTime);
+
+	else if (arrowButtons.at(3)->isClicked())
+		adjustValue(coords.right, false, deltaTime);
+
+	else if (arrowButtons.at(4)->isClicked())
+		adjustValue(coords.maxIterations, false, deltaTime);
+
+	else if (arrowButtons.at(5)->isClicked())
+		adjustValue(threadsUsed, false, deltaTime);
+
+	else if (arrowButtons.at(6)->isClicked())
+		adjustValue(coords.top, true, deltaTime);
+
+	else if (arrowButtons.at(7)->isClicked())
+		adjustValue(coords.bottom, true, deltaTime);
+
+	else if (arrowButtons.at(8)->isClicked())
+		adjustValue(coords.left, true, deltaTime);
+
+	else if (arrowButtons.at(9)->isClicked())
+		adjustValue(coords.right, true, deltaTime);
+
+	else if (arrowButtons.at(10)->isClicked())
+		adjustValue(coords.maxIterations, true, deltaTime);
+
+	else if (arrowButtons.at(11)->isClicked())
+		adjustValue(threadsUsed, true, deltaTime);
+}
+
 void Application::setupMandelbrot()
 {
-	ImageCoordinates coords;
 	ImageDimensions dims;
 
 	//Setting the parameters for each image strip relative to the number of assigned threads
-	for (int i = 0; i < MAX_THREADS; ++i)
+	for (int i = 0; i < threadsUsed; ++i)
 	{
 		dims.minX = 0;
 		dims.maxX = WIDTH;
 
-		dims.minY = i * (HEIGHT / MAX_THREADS);
-		dims.maxY = dims.minY + (HEIGHT / MAX_THREADS);
+		dims.minY = i * (HEIGHT / threadsUsed);
+		dims.maxY = dims.minY + (HEIGHT / threadsUsed);
 
-		mandelbrotQueue.push(new Mandelbrot(&coords, &dims));
+		mandelbrotQueue.push(new Mandelbrot(&imageCoordinates, &dims));
 	}
 }
 
@@ -164,7 +291,7 @@ void Application::runMandelbrot()
 
 	std::vector<std::thread*> threads;
 
-	for (int i = 0; i < MAX_THREADS; ++i)
+	for (int i = 0; i < threadsUsed; ++i)
 	{
 		threads.push_back(new std::thread([&]
 		{
@@ -183,7 +310,7 @@ void Application::runMandelbrot()
 		}));
 	}
 
-	for (int i = 0; i < MAX_THREADS; ++i)
+	for (int i = 0; i < threadsUsed; ++i)
 	{
 		threads[i]->join();
 	}

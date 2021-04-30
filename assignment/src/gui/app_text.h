@@ -14,5 +14,5 @@ public:
 	
 private:
 	sf::Font font;
-	const int defaultSize = 64;
+	const int defaultSize = 48;
 };

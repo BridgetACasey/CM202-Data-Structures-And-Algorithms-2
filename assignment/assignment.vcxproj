@@ -192,6 +192,7 @@ xcopy /y /d "$(SolutionDir)assets\*" "$(OutDir)assets\"</Command>
     <ClInclude Include="src\gui\input_manager.h" />
     <ClInclude Include="src\gui\window.h" />
     <ClInclude Include="src\gui\app_text.h" />
+    <ClInclude Include="src\utility.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

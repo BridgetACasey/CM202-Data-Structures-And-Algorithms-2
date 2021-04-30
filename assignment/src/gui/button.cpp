@@ -14,7 +14,7 @@ Button::~Button()
 {
 }
 
-void Button::setText(const char* txt)
+void Button::setText(const char* txt)	//Sets a text object to appear inside the button boundaries
 {
 	text->setPosition(sf::Vector2f(getPosition().x, getPosition().y));
 	text->setCharacterSize(getSize().y * 0.75f);
@@ -22,7 +22,7 @@ void Button::setText(const char* txt)
 	text->setString(txt);
 }
 
-bool Button::isHovering()
+bool Button::isHovering()	//Returns true and changes the object colour if the mouse is overlapping its position
 {
 	if (inputManager->getMouse().x > getPosition().x && inputManager->getMouse().x < getPosition().x + getSize().x)
 	{

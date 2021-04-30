@@ -1,3 +1,5 @@
+//@BridgetACasey
+
 #pragma once
 
 #include <complex>
@@ -33,7 +35,6 @@ public:
 	~Mandelbrot();
 
 	void compute();
-	void writeToTGA(const char* fileName);
 
 private:
 	std::mutex imageMutex;

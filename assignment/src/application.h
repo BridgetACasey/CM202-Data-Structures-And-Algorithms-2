@@ -15,6 +15,14 @@ class Mandelbrot;
 #include <queue>
 #include <mutex>
 
+//Allows for easy switching between states in the Mandelbrot GUI
+enum class ApplicationState
+{
+	MENU = 0,
+	LOADING,
+	IMAGE
+};
+
 class Application
 {
 public:
@@ -23,24 +31,35 @@ public:
 
 	void run();
 
-	void render();
+	void update();	//Update SFML-related functions
+	void render();	//Render sprites to screen
 
 private:
 	void setupMandelbrot();
 	void runMandelbrot();
 
-	void generateSprite();
+	void generateSprite();	//Converts Mandelbrot image data into RGBA pixel values to be read by SFML
+	void writeToTGA(const char* fileName);
+
+	bool calculating;	//To check if the Mandelbrot image is being calculated
+	
+	ApplicationState appState;
 
 	InputManager* inputManager;
 	Window* window;
 
 	AppText* title;
-	Button* button;
+	AppText* loading;
+
+	Button* runButton;
+	Button* quitButton;
+	Button* backButton;
 
 	std::queue<Mandelbrot*> mandelbrotQueue;
-
+	std::condition_variable queueCondition;
 	std::mutex mandelbrotMutex;
 
+	//For creating a display from an array of pixels, SFML requires separate image, texture, and sprite objects
 	sf::Image displayImage;
 	sf::Texture displayTexture;
 	sf::Sprite displaySprite;

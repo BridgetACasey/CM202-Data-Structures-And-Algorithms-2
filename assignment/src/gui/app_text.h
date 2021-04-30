@@ -5,6 +5,7 @@
 
 #pragma once
 
+//An SFML text object with pre-assigned values for size and font
 class AppText : public sf::Text
 {
 public:

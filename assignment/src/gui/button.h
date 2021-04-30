@@ -7,6 +7,7 @@
 
 class InputManager;
 
+//A ui button object that can be used to check for state changes
 class Button : public sf::RectangleShape
 {
 public:

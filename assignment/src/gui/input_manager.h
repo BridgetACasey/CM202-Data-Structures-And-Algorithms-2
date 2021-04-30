@@ -14,6 +14,7 @@ struct Mouse
 	float y;
 };
 
+//Handles mouse and keyboard input events
 class InputManager
 {
 	friend class Window;
@@ -22,6 +23,7 @@ public:
 	InputManager();
 	~InputManager();
 
+	//Returns true if the corresponding key is pressed or released
 	bool isKeyPressed(sf::Keyboard::Key key) const;
 	bool isKeyReleased(sf::Keyboard::Key key) const;
 

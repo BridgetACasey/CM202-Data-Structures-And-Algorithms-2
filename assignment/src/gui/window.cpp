@@ -22,6 +22,7 @@ void Window::update()
 {
     sf::Event event;
 
+	//While the render window is open, check for key and mouse press events
     while (pollEvent(event))
     {
 		switch (event.type)
@@ -74,6 +75,7 @@ void Window::update()
 
 void Window::clearBuffer()
 {
+	//Clears the screen and sets it to appear black by default
 	clear(sf::Color(0, 0, 0, 255));
 }
 

@@ -4,6 +4,7 @@
 
 class InputManager;
 
+//The SFML render window, responsible for managing window and user input events
 class Window : public sf::RenderWindow
 {
 public:

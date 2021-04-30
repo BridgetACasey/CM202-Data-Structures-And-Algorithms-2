@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include "windows.h"
 
+//A function that prints a message to the debug console, used for testing purposes
 void debugPrint(const char* message, ...)
 {
     va_list args;

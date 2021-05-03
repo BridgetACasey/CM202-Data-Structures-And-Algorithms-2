@@ -121,7 +121,7 @@ void Application::runMandelbrot()
 	timeTakenText->setString("TIME TAKEN (ms): " + std::to_string(timeTaken));
 
 	//Creating the SFML sprite image and writing to the .TGA file concurrently
-	std::thread* writeThread = new std::thread([&] { writeToTGA("output/last-result.tga"); });
+	std::thread* writeThread = new std::thread([&] { writeToTGA("last-result.tga"); });
 	std::thread* spriteThread = new std::thread([&] { generateSprite(); });
 
 	writeThread->join();

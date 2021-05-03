@@ -57,12 +57,13 @@ private:
 
 	void updateCoordinates(ImageCoordinates& coords);
 	
-	inline float getDeltaTime() { sf::Clock appClock; return appClock.restart().asSeconds(); }
+	inline float getDeltaTime() { return appClock.restart().asSeconds(); }
 	
 	void setupText();
 	void setupButtons();
 	
 	float deltaTime;
+	sf::Clock appClock;
 
 	ApplicationState appState;
 

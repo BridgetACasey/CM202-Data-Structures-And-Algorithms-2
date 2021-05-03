@@ -7,11 +7,7 @@
 #include "gui/button.h"
 
 #include "utility.h"
-
-#include <thread>
-#include <chrono>
-
-typedef std::chrono::steady_clock chrono_clock;
+#include "test_suite.h"
 
 const int MAX_THREADS = std::thread::hardware_concurrency();	//Max available threads relative to the system hardware
 
@@ -29,6 +25,7 @@ Application::Application()
 
 	inputManager = new InputManager();
 	window = new Window(inputManager);
+	testSuite = new TestSuite();
 
 	setupText();
 	setupButtons();
@@ -53,75 +50,16 @@ void Application::run()
 	}
 }
 
-void Application::setupMandelbrot()
+void Application::runMandelbrotSequence()
 {
-	ImageDimensions dims;
-	ImageCoordinates coords;
-
-	coords = imageCoordinates;
-
-	coords.maxIterations = (int)maxItrs;
-
-	int threadsUsed = (int)threadCount;
-
-	//Setting the parameters for each image strip relative to the number of assigned threads
-	for (int i = 0; i < threadsUsed; ++i)
-	{
-		dims.minX = 0;
-		dims.maxX = WIDTH;
-
-		dims.minY = i * (HEIGHT / threadsUsed);
-		dims.maxY = dims.minY + (HEIGHT / threadsUsed);
-
-		mandelbrotQueue.push(new Mandelbrot(&coords, &dims));
-	}
-}
-
-void Application::runMandelbrot()
-{
-	setupMandelbrot();	//Load strips into mandelbrot queue
-
-	std::vector<std::thread*> threads;
-
-	int threadsUsed = (int)threadCount;
-
-	chrono_clock::time_point startTime = chrono_clock::now();
-
-	for (int i = 0; i < threadsUsed; ++i)
-	{
-		threads.push_back(new std::thread([&]
-		{
-			std::unique_lock<std::mutex> lock(mandelbrotMutex);	//Check if any image strips remain in queue, otherwise move to calculation
-			queueCondition.wait(lock, [this]() { return !mandelbrotQueue.empty(); });
-
-			Mandelbrot* current = mandelbrotQueue.front();	//Assign the topmost strip to this thread
-			mandelbrotQueue.pop();
-
-			lock.unlock();
-			queueCondition.notify_all();
-
-			current->compute();	//Calculate the given strip of the mandelbrot image
-
-			delete current;
-		}));
-	}
-
-	for (int i = 0; i < threadsUsed; ++i)
-	{
-		threads[i]->join();
-	}
-
+	testSuite->testMandelbrot(imageCoordinates, 5, MAX_THREADS, "mandelbrot-test-data.csv");
+	
 	calculatingMandelbrot = false;
 
-	//Calculate the time taken when generating the mandelbrot image
-	chrono_clock::time_point endTime = chrono_clock::now();
-
-	auto timeTaken = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
-
-	timeTakenText->setString("TIME TAKEN (ms): " + std::to_string(timeTaken));
+	timeTakenText->setString("AVG TIME TAKEN (ms): " + std::to_string(testSuite->getAverageTimeTaken()));
 
 	//Creating the SFML sprite image and writing to the .TGA file concurrently
-	std::thread* writeThread = new std::thread([&] { writeToTGA("last-result.tga"); });
+	std::thread* writeThread = new std::thread([&] { writeToTGA("mandelbrot-image.tga"); });
 	std::thread* spriteThread = new std::thread([&] { generateSprite(); });
 
 	writeThread->join();
@@ -215,7 +153,7 @@ void Application::update()
 	//Checking for this before the switch statement so the loading screen is displayed before calculations begin
 	if (calculatingMandelbrot)
 	{
-		runMandelbrot();
+		runMandelbrotSequence();
 	}
 
 	//Update application based on current state
@@ -371,7 +309,7 @@ void Application::setupText()
 
 	timeTakenText = new AppText();
 	timeTakenText->setPosition(sf::Vector2f(100.0f, 800.0f));
-	timeTakenText->setString("TIME TAKEN (ms): ");
+	timeTakenText->setString("AVG TIME TAKEN (ms): ");
 
 	AppText* top = new AppText();
 	top->setPosition(sf::Vector2f(250.0f, 250.0f));

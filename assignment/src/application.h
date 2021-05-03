@@ -6,6 +6,7 @@ class Window;
 class InputManager;
 class AppText;
 class Button;
+class TestSuite;
 
 #include "mandelbrot.h"
 
@@ -36,8 +37,7 @@ public:
 	void render();	//Render sprites to screen
 
 private:		
-	void setupMandelbrot();
-	void runMandelbrot();
+	void runMandelbrotSequence();
 
 	void writeToTGA(const char* fileName);
 
@@ -45,6 +45,8 @@ private:
 
 	float threadCount;
 	float maxItrs;
+
+	TestSuite* testSuite;
 
 	ImageCoordinates imageCoordinates;
 

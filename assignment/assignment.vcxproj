@@ -183,6 +183,7 @@ xcopy /y /d "$(SolutionDir)assets\*" "$(OutDir)assets\"</Command>
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\gui\window.cpp" />
     <ClCompile Include="src\gui\app_text.cpp" />
+    <ClCompile Include="src\test_suite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\mandelbrot.h" />
@@ -193,6 +194,7 @@ xcopy /y /d "$(SolutionDir)assets\*" "$(OutDir)assets\"</Command>
     <ClInclude Include="src\gui\window.h" />
     <ClInclude Include="src\gui\app_text.h" />
     <ClInclude Include="src\utility.h" />
+    <ClInclude Include="src\test_suite.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -46,8 +46,8 @@ void Mandelbrot::compute()
 				// This point is in the Mandelbrot set.
 				std::unique_lock<std::mutex> lock(imageMutex);
 
-				//image[y][x] = 0x000000; // black
-				image[y][x] = (16 << iterations) + (8 << iterations) + (iterations);
+				image[y][x] = 0x000000; // black
+				//image[y][x] = (16 << iterations) + (8 << iterations) + (iterations);
 			}
 			else
 			{

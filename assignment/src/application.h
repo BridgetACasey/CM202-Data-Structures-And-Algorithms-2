@@ -2,8 +2,8 @@
 
 #pragma once
 
-class InputManager;
 class Window;
+class InputManager;
 class AppText;
 class Button;
 
@@ -15,7 +15,6 @@ class Button;
 #include <SFML/System/Clock.hpp>
 
 #include <queue>
-#include <mutex>
 
 //Allows for easy switching between states in the Mandelbrot GUI
 enum class ApplicationState
@@ -36,28 +35,35 @@ public:
 	void update();	//Update SFML-related functions
 	void render();	//Render sprites to screen
 
-private:
-	float getDeltaTime();
-	
-	void updateCoordinates(ImageCoordinates& coords);
-	
+private:		
 	void setupMandelbrot();
 	void runMandelbrot();
 
-	void generateSprite();	//Converts Mandelbrot image data into RGBA pixel values to be read by SFML
 	void writeToTGA(const char* fileName);
+
+	bool calculatingMandelbrot;	//To check if the Mandelbrot image is currently being calculated to switch to the loading screen
+
+	float threadCount;
+	float maxItrs;
+
+	ImageCoordinates imageCoordinates;
+
+	std::mutex mandelbrotMutex;
+	std::queue<Mandelbrot*> mandelbrotQueue;
+	std::condition_variable queueCondition;
+	
+	//GUI-related functions and variables
+	void generateSprite();	//Converts Mandelbrot image data into RGBA pixel values to be read by SFML
+
+	void updateCoordinates(ImageCoordinates& coords);
+	
+	inline float getDeltaTime() { sf::Clock appClock; return appClock.restart().asSeconds(); }
+	
+	void setupText();
+	void setupButtons();
 	
 	float deltaTime;
 
-	bool calculating;	//To check if the Mandelbrot image is being calculated
-	int threadsUsed;
-
-	std::queue<Mandelbrot*> mandelbrotQueue;
-	std::condition_variable queueCondition;
-	std::mutex mandelbrotMutex;
-
-	ImageCoordinates imageCoordinates;
-	
 	ApplicationState appState;
 
 	InputManager* inputManager;
@@ -65,6 +71,7 @@ private:
 
 	AppText* menuTitleText;
 	AppText* loadingScreenText;
+	AppText* timeTakenText;
 
 	Button* runButton;
 	Button* quitButton;
@@ -72,8 +79,6 @@ private:
 
 	std::vector<Button*> arrowButtons;
 	std::vector<AppText*> arrowText;
-
-	sf::Clock appClock;
 
 	//For creating a display from an array of pixels, SFML requires separate image, texture, and sprite objects
 	sf::Image displayImage;

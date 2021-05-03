@@ -2,7 +2,8 @@
 
 #pragma once
 
-void clamp(int& value, int lowerBound, int upperBound)
+//Clamps a value between a minimum and maximum bound
+void clamp(float& value, float lowerBound, float upperBound)
 {
 	if (value > upperBound)
 	{
@@ -15,6 +16,7 @@ void clamp(int& value, int lowerBound, int upperBound)
 	}
 }
 
+//Clamps a value between a minimum and maximum bound
 void clamp(double& value, double lowerBound, double upperBound)
 {
 	if (value > upperBound)
@@ -28,28 +30,30 @@ void clamp(double& value, double lowerBound, double upperBound)
 	}
 }
 
-void adjustValue(int& value, bool increment, float deltaTime)
+//Increments or decrements a value by a given speed and relative to delta time
+void adjustValue(float& value, bool isIncrementing, float speed, float deltaTime)
 {
-	if (increment)
+	if (isIncrementing)
 	{
-		value += 1;
+		value += speed * deltaTime;
 	}
 
 	else
 	{
-		value -= 1;
+		value -= speed * deltaTime;
 	}
 }
 
-void adjustValue(double& value, bool increment, float deltaTime)
+//Increments or decrements a value by a given speed and relative to delta time
+void adjustValue(double& value, bool isIncrementing, double speed, float deltaTime)
 {
-	if (increment)
+	if (isIncrementing)
 	{
-		value += 0.1 * deltaTime;
+		value += speed * deltaTime;
 	}
 
 	else
 	{
-		value -= 0.1 * deltaTime;
+		value -= speed * deltaTime;
 	}
 }

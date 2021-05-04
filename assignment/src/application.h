@@ -44,7 +44,8 @@ private:
 	bool calculatingMandelbrot;	//To check if the Mandelbrot image is currently being calculated to switch to the loading screen
 
 	float threadCount;
-	float maxItrs;
+	float maxImageItrs;
+	float maxTestItrs;
 
 	TestSuite* testSuite;
 
@@ -59,11 +60,12 @@ private:
 
 	void updateCoordinates(ImageCoordinates& coords);
 	
-	inline float getDeltaTime() { return appClock.restart().asSeconds(); }
-	
 	void setupText();
 	void setupButtons();
-	
+
+	//For getting the time between frames
+	inline float getDeltaTime() { return appClock.restart().asSeconds(); }
+
 	float deltaTime;
 	sf::Clock appClock;
 
@@ -74,15 +76,15 @@ private:
 
 	AppText* menuTitleText;
 	AppText* loadingScreenText;
-	AppText* setupTimeText;
-	AppText* runTimeText;
+
+	std::vector<AppText*> resultsText;
 
 	Button* runButton;
 	Button* quitButton;
 	Button* backToMenuButton;
 
-	std::vector<Button*> arrowButtons;
-	std::vector<AppText*> arrowText;
+	std::vector<Button*> optionsButtons;
+	std::vector<AppText*> optionsText;
 
 	//For creating a display from an array of pixels, SFML requires separate image, texture, and sprite objects
 	sf::Image displayImage;

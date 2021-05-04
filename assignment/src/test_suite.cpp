@@ -2,15 +2,30 @@
 
 #include "test_suite.h"
 
+#include <windows.h>
+#include <psapi.h>
 #include <thread>
 #include <chrono>
 
 typedef std::chrono::steady_clock chrono_clock;
 
+int totalCPUs = 0;	//Total available processors
+
+ULARGE_INTEGER lastCPU;
+ULARGE_INTEGER lastSystemCPU;
+ULARGE_INTEGER lastUserCPU;
+
+HANDLE selfHandle;
+
 TestSuite::TestSuite()
 {
-	averageSetupTime = 0;
-	averageRunTime = 0;
+	averageSetupTime = 0.0f;
+	averageCalcTime = 0.0f;
+
+	averageCPUsUsed = 0.0;
+	averageVirtualMemory = 0.0;
+
+	setSystemInfo();
 }
 
 TestSuite::~TestSuite()
@@ -45,14 +60,19 @@ void TestSuite::testMandelbrot(ImageCoordinates& imageCoordinates, int testItera
 	std::ofstream writeFile(fileName, std::ofstream::trunc);	//Open new file and overwrite any pre-existing contents
 
 	std::vector<float> totalSetupTimes;
-	std::vector<float> totalRunTimes;
+	std::vector<float> totalCalcTimes;
+	std::vector<double> totalUsageCPU;
+	std::vector<double> totalUsageVirtualMemory;
 
 	chrono_clock::time_point startTime;
 	chrono_clock::time_point endTime;
 
-	float timeTaken = 0;
-	averageSetupTime = 0;
-	averageRunTime = 0;
+	//Resetting average values for new test run
+	averageSetupTime = 0.0f;
+	averageCalcTime = 0.0f;
+
+	averageCPUsUsed = 0.0;
+	averageVirtualMemory = 0.0;
 
 	for (int i = 0; i < testIterations; ++i)
 	{
@@ -81,16 +101,28 @@ void TestSuite::testMandelbrot(ImageCoordinates& imageCoordinates, int testItera
 					delete current;
 				}));
 
-				if (j == (threadsUsed - 1))	//Check if thread setup is complete, then measure the time taken before Mandelbrot calculations begin
+				if (j == (threadsUsed - 1))	//Check if thread setup is complete
 				{
 					endTime = chrono_clock::now();
 				
-					timeTaken = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+					//Take key measurements before parallelised Mandelbrot calculations begin
+					float setupTime = std::chrono::duration_cast<std::chrono::nanoseconds>(endTime - startTime).count();
+					setupTime /= 1000000.0f;	//Converting to milliseconds
+					totalSetupTimes.push_back(setupTime);
+
+					double cpuUsed = getCurrentProcessCPU();
+					totalUsageCPU.push_back(cpuUsed);
+
+					double memoryUsed = getCurrentProcessVirtualMemory();
+					memoryUsed /= 1024.0;	//Converting to kilobytes
+					memoryUsed /= 1024.0;	//Converting to megabytes
+					totalUsageVirtualMemory.push_back(memoryUsed);
 				
-					totalSetupTimes.push_back(timeTaken);
+					//Write current results to .csv file
+					writeFile << "Test Itr:," << i << ",CPU:," << cpuUsed << "%" << ",VM:," << memoryUsed << ",MB"
+						<< ",Setup Time:," << setupTime << ",ms";
 				
-					writeFile << "Test No:	," << j + 1 << ", Max Itrs: ," << imageCoordinates.maxIterations << ",Setup Time: ," << timeTaken << ",ms";
-				
+					//Restart the timer and let the threads run
 					startTime = chrono_clock::now();
 				}
 			}
@@ -103,26 +135,117 @@ void TestSuite::testMandelbrot(ImageCoordinates& imageCoordinates, int testItera
 		//Measure the time to process the parallelised Mandelbrot image and write to .csv file
 		endTime = chrono_clock::now();
 
-		timeTaken = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+		float calcTime = std::chrono::duration_cast<std::chrono::nanoseconds>(endTime - startTime).count();
+		calcTime /= 1000000.0f; //Converting to milliseconds
+		totalCalcTimes.push_back(calcTime);
 
-		totalRunTimes.push_back(timeTaken);
-
-		writeFile << ",Run Time: ," << timeTaken << ",ms" << std::endl;
+		writeFile << ",Calc Time:," << calcTime << ",ms" << std::endl;
 	}
 
-	//Work out the average run time across all test iterations
+	//Work out the averages across all test iterations
 	for (float setupTime : totalSetupTimes)
 	{
 		averageSetupTime += setupTime;
 	}
 	
-	for (float runTime : totalRunTimes)
+	for (float calcTime : totalCalcTimes)
 	{
-		averageRunTime += runTime;
+		averageCalcTime += calcTime;
+	}
+
+	for (double usedCPU : totalUsageCPU)
+	{
+		averageCPUsUsed += usedCPU;
+	}
+
+	for (double usedVirtualMemory : totalUsageVirtualMemory)
+	{
+		averageVirtualMemory += usedVirtualMemory;
 	}
 
 	averageSetupTime /= testIterations;
-	averageRunTime /= testIterations;
+	averageCalcTime /= testIterations;
+	averageCPUsUsed /= testIterations;
+	averageVirtualMemory /= testIterations;
 
-	writeFile << "Avg Setup Time: ," << averageSetupTime << ",ms" << ",Avg Run Time: ," << averageRunTime << ",ms" << std::endl;
+	//Write the final averages to the .csv file
+	writeFile << "Avg Setup Time:," << averageSetupTime << ",ms" << std::endl;
+	writeFile << "Avg Calc Time:," << averageCalcTime << ",ms" << std::endl;
+	writeFile << "Avg CPU Usage:," << averageCPUsUsed << "%" << std::endl;
+	writeFile << "Avg VM Usage:," << averageVirtualMemory << ",MB" << std::endl;
+
+	writeFile.close();
+}
+
+void TestSuite::setSystemInfo()
+{
+	//Retrieving and setting initial time data for CPU usage calculations
+	SYSTEM_INFO systemInfo;
+
+	FILETIME timeFile;
+	FILETIME systemFile;
+	FILETIME userFile;
+
+	GetSystemInfo(&systemInfo);
+	totalCPUs = systemInfo.dwNumberOfProcessors;
+
+	GetSystemTimeAsFileTime(&timeFile);
+	memcpy(&lastCPU, &timeFile, sizeof(FILETIME));
+
+	selfHandle = GetCurrentProcess();
+
+	GetProcessTimes(selfHandle, &timeFile, &timeFile, &systemFile, &userFile);
+
+	memcpy(&lastSystemCPU, &systemFile, sizeof(FILETIME));
+	memcpy(&lastUserCPU, &userFile, sizeof(FILETIME));
+}
+
+double TestSuite::getCurrentProcessCPU()
+{
+	//Percentage of CPUs being actively used by the current process
+	double cpuPercentage = 0.0;
+
+	FILETIME currentFile;
+	FILETIME systemFile;
+	FILETIME userFile;
+
+	ULARGE_INTEGER current;
+	ULARGE_INTEGER system;
+	ULARGE_INTEGER user;
+
+	GetSystemTimeAsFileTime(&currentFile);
+
+	memcpy(&current, &currentFile, sizeof(FILETIME));
+
+	//Retrieving and storing timing information for the current process
+	GetProcessTimes(selfHandle, &currentFile, &currentFile, &systemFile, &userFile);
+
+	memcpy(&system, &systemFile, sizeof(FILETIME));
+	memcpy(&user, &userFile, sizeof(FILETIME));
+
+	//Calculating percentage of CPUs used relative to the max available
+	cpuPercentage = (system.QuadPart - lastSystemCPU.QuadPart) + (user.QuadPart - lastUserCPU.QuadPart);
+	cpuPercentage /= (current.QuadPart - lastCPU.QuadPart);
+	cpuPercentage /= totalCPUs;
+
+	lastCPU = current;
+	lastUserCPU = user;
+	lastSystemCPU = system;
+
+	cpuPercentage *= 100.0;
+
+	return cpuPercentage;
+}
+
+unsigned long TestSuite::getCurrentProcessVirtualMemory()
+{
+	//Amount of virtual memory in bytes used by the current process
+	PROCESS_MEMORY_COUNTERS_EX processMemoryCounters{};
+	SIZE_T virtualMemoryUsed = 0;
+
+	GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&processMemoryCounters, sizeof(processMemoryCounters));
+
+	virtualMemoryUsed = processMemoryCounters.PrivateUsage;
+
+	return virtualMemoryUsed;
 }

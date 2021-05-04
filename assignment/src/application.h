@@ -74,11 +74,12 @@ private:
 
 	AppText* menuTitleText;
 	AppText* loadingScreenText;
-	AppText* timeTakenText;
+	AppText* setupTimeText;
+	AppText* runTimeText;
 
 	Button* runButton;
 	Button* quitButton;
-	Button* backButton;
+	Button* backToMenuButton;
 
 	std::vector<Button*> arrowButtons;
 	std::vector<AppText*> arrowText;

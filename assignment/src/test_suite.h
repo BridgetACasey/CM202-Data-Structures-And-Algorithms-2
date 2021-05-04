@@ -12,17 +12,18 @@ public:
 	TestSuite();
 	~TestSuite();
 
-	void testMandelbrot(ImageCoordinates& imageCoordinates, int iterations, int threadsUsed, const char* fileName);
+	void testMandelbrot(ImageCoordinates& imageCoordinates, int testIterations, int threadsUsed, const char* fileName);
 
-	inline int getAverageTimeTaken() { return averageTimeTaken; }
+	inline float getAverageSetupTime() { return averageSetupTime; }
+	inline float getAverageRunTime() { return averageRunTime; }
 
 private:
-	void setupMandelbrot(ImageCoordinates& imageCoordinates, int maxItrs, int threadsUsed);
-	void runMandelbrot(int threadsUsed);
+	void setupMandelbrotQueue(ImageCoordinates& imageCoordinates, int maxItrs, int threadsUsed);
 
 	std::mutex mandelbrotMutex;
 	std::queue<Mandelbrot*> mandelbrotQueue;
 	std::condition_variable queueCondition;
 
-	int averageTimeTaken;
+	float averageSetupTime;
+	float averageRunTime;
 };

@@ -149,21 +149,6 @@ void Application::render()
 void Application::runMandelbrotSequence()
 {
 	testSuite->testMandelbrot(imageCoordinates, (int)maxTestItrs, (int)threadCount, "mandelbrot-test-data.csv");
-
-	//testSuite->testMandelbrot(imageCoordinates, 1000, 3, "mandelbrot-data-threadx3-itrx500.csv");
-	//testSuite->testMandelbrot(imageCoordinates, 1000, 4, "mandelbrot-data-threadx4-itrx500.csv");
-	//testSuite->testMandelbrot(imageCoordinates, 1000, 5, "mandelbrot-data-threadx5-itrx500.csv");
-	//testSuite->testMandelbrot(imageCoordinates, 1000, 6, "mandelbrot-data-threadx6-itrx500.csv");
-	//testSuite->testMandelbrot(imageCoordinates, 1000, 7, "mandelbrot-data-threadx7-itrx500.csv");
-	//testSuite->testMandelbrot(imageCoordinates, 1000, 8, "mandelbrot-data-threadx8-itrx500.csv");
-	//testSuite->testMandelbrot(imageCoordinates, 1000, 9, "mandelbrot-data-threadx9-itrx500.csv");
-	//testSuite->testMandelbrot(imageCoordinates, 1000, 10, "mandelbrot-data-threadx10-itrx500.csv");
-	//testSuite->testMandelbrot(imageCoordinates, 1000, 11, "mandelbrot-data-threadx11-itrx500.csv");
-	//testSuite->testMandelbrot(imageCoordinates, 1000, 12, "mandelbrot-data-threadx12-itrx500.csv");
-	//testSuite->testMandelbrot(imageCoordinates, 1000, 13, "mandelbrot-data-threadx13-itrx500.csv");
-	//testSuite->testMandelbrot(imageCoordinates, 1000, 14, "mandelbrot-data-threadx14-itrx500.csv");
-	//testSuite->testMandelbrot(imageCoordinates, 1000, 15, "mandelbrot-data-threadx15-itrx500.csv");
-	//testSuite->testMandelbrot(imageCoordinates, 1000, 16, "mandelbrot-data-threadx16-itrx500.csv");
 	
 	calculatingMandelbrot = false;
 

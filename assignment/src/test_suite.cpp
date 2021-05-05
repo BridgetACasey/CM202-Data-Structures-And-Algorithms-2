@@ -119,7 +119,7 @@ void TestSuite::testMandelbrot(ImageCoordinates& imageCoordinates, int testItera
 					totalUsageVirtualMemory.push_back(memoryUsed);
 				
 					//Write current results to .csv file
-					writeFile << "Test Itr:," << i << ",CPU:," << cpuUsed << "%" << ",VM:," << memoryUsed << ",MB"
+					writeFile << "Test Itr:," << i << ",CPU Usage:," << cpuUsed << ",%" << ",VM Usage:," << memoryUsed << ",MB"
 						<< ",Setup Time:," << setupTime << ",ms";
 				
 					//Restart the timer and let the threads run
@@ -168,11 +168,11 @@ void TestSuite::testMandelbrot(ImageCoordinates& imageCoordinates, int testItera
 	averageCPUsUsed /= testIterations;
 	averageVirtualMemory /= testIterations;
 
+	writeFile << std::endl;
+
 	//Write the final averages to the .csv file
-	writeFile << "Avg Setup Time:," << averageSetupTime << ",ms" << std::endl;
-	writeFile << "Avg Calc Time:," << averageCalcTime << ",ms" << std::endl;
-	writeFile << "Avg CPU Usage:," << averageCPUsUsed << "%" << std::endl;
-	writeFile << "Avg VM Usage:," << averageVirtualMemory << ",MB" << std::endl;
+	writeFile << "Total Tests:," << testIterations << ",Avg CPU Usage:," << averageCPUsUsed << ",%" << ",Avg VM Usage:," << averageVirtualMemory
+		<< ",MB" << ",Avg Setup Time:," << averageSetupTime << ",ms" << ",Avg Calc Time:,"<< averageCalcTime << ",ms" << std::endl;
 
 	writeFile.close();
 }
